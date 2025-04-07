@@ -1,4 +1,26 @@
 import tkinter as tk
+mainbalance = 0
+income = 0
+expense = 0
+
+def update_balance():
+    balance.config(text = f"{mainbalance} BDT")
+    income_label.config(text= f"{income} BDT")
+    expense_label.config(text= f"{expense} BDT")
+
+def add_income():
+    global mainbalance, income
+    value = int(input("Enter Income:\n"))
+    mainbalance = value + mainbalance
+    income = income + value
+
+def add_expense():
+    global mainbalance, expense
+    value = int(input("Enter Expense:\n"))
+    mainbalance = mainbalance - value
+    expense = expense + value
+
+
 
 window = tk.Tk()
 window.geometry("720x720")
@@ -25,14 +47,44 @@ frame1.rowconfigure(1,weight=1, uniform='a')
 frame1.rowconfigure(2,weight=1, uniform='a')
 frame1.columnconfigure((0,1),weight=1, uniform='a')
 
-balance = tk.Label(master = frame1, text = "BALANCE", font = ('arial', 40), bg='yellow')
+balance = tk.Label(master = frame1, text = f"{mainbalance} BDT", font = ('arial', 40), bg='yellow')
 balance.grid(column = 0, row = 0, columnspan = 2, sticky = 'w')
 
-income = tk.Label(master = frame1, text = "Income", font = ('arial', 12), bg='blue')
-income.grid(column = 0, row = 1, sticky = 'nsew')
+#Income Tab
+income_card = tk.Frame(master=frame1, bg='white')
+income_card.grid(column=0,row=1, sticky="nsew")
+income_card.columnconfigure(0, weight=1, uniform='a')  # Ensure column is set to expand
+income_card.rowconfigure((0, 1, 2), weight=1, uniform='a')  # Ensure rows expand
 
-expense = tk.Label(master = frame1, text = "Expense", font = ('arial', 12), bg='green')
-expense.grid(column = 1, row = 1, sticky = 'nsew')
+# Income label
+income_label = tk.Label(master=income_card, text="Income of this month:", font=('arial', 12), bg="white")
+income_label.grid(column=0, row=0, sticky='w')
+
+# Income value label
+income_value = tk.Label(master=income_card, text=f"{income} BDT", font=('arial', 12), bg="white")
+income_value.grid(column=0, row=1, sticky="nsew")
+
+# Add income button
+add_income = tk.Button(master=income_card, text="Add Income", font=('arial', 10), bg="white", command=add_income)
+add_income.grid(column=0, row=2, sticky="nsew")
+
+#Expense Tab
+expense_card = tk.Frame(master=frame1, bg='white')
+expense_card.grid(column=1,row=1, sticky="nsew")
+expense_card.columnconfigure(0, weight=1, uniform='a')  # Ensure column is set to expand
+expense_card.rowconfigure((0, 1, 2), weight=1, uniform='a')  # Ensure rows expand
+
+# Income label
+expense_label = tk.Label(master=expense_card, text="Expense of this month:", font=('arial', 12), bg="white")
+expense_label.grid(column=0, row=0, sticky='w')
+
+# Income value label
+expense_value = tk.Label(master=expense_card, text=f"{expense} BDT", font=('arial', 12), bg="white")
+expense_value.grid(column=0, row=1, sticky="nsew")
+
+# Add income button
+add_expense = tk.Button(master=expense_card, text="Add Expense", font=('arial', 10), bg="white", command=add_expense)
+add_expense.grid(column=0, row=2, sticky="nsew")
 
 cashFlo = tk.Label(master = frame1, text = "CashFlo", font = ('arial', 10), bg='orange')
 cashFlo.grid(column = 0, row = 2, columnspan = 2, sticky = 'nsew')
