@@ -95,7 +95,6 @@ budget_card.rowconfigure((0, 1), weight=1, uniform='a')
 budget_card.columnconfigure((0, 1, 2, 3), weight=1, uniform='a')
 
 ##############################
-# Header for Budget Summary
 category_label = tk.Label(master=budget_card, text="Category", fg="green", font=('Arial', 15), bg="lightgray", relief="groove")
 category_label.grid(column=0, row=0, sticky='nsew')
 
