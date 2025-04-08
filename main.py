@@ -2,23 +2,71 @@ import tkinter as tk
 mainbalance = 0
 income = 0
 expense = 0
+cashflow = 0
+
+accounts = ['Cash', 'Bank', 'Bkash','Saving']
+categories  = ['Food & Drinks', 'Health', 'Groceries','Transport', 'Bill & Fees']
+
+def update_cashflow():
+    global cashflow, income, expense
+    cashflow = income - expense
+    if cashflow >= 0:
+        cashflow_label.config(text= f"+{cashflow} BDT", fg='green')
+    else:
+        cashflow_label.config(text= f"-{cashflow} BDT", fg='red')
+
 
 def update_balance():
     balance.config(text = f"{mainbalance} BDT")
-    income_label.config(text= f"{income} BDT")
-    expense_label.config(text= f"{expense} BDT")
+    income_value.config(text= f"{income} BDT")
+    expense_value.config(text= f"{expense} BDT")
+    update_cashflow()
 
 def add_income():
-    global mainbalance, income
-    value = int(input("Enter Income:\n"))
-    mainbalance = value + mainbalance
-    income = income + value
+    #Income prompt
+    income_prompt = tk.Toplevel(master = window)
+    income_prompt.geometry('300x200')
+    income_prompt.title("Entry pop")
+
+    income_prompt.rowconfigure((0,1), weight=1, uniform='a')
+    income_prompt.columnconfigure(0, weight=1, uniform='a')
+
+    incom_entry = tk.Entry(master=income_prompt, font=('arial', 60))
+    incom_entry.grid(column=0,row=0, sticky='nsew')
+
+    def submit_income():
+        global mainbalance, income
+        value = float(incom_entry.get())
+        mainbalance = value + mainbalance
+        income = income + value
+        update_balance()
+        income_prompt.destroy()
+
+    # incom_submit = tk.Button(master=income_prompt, text='Add Transactoin', command=submit_income)
+    # incom_submit.grid(column=0,row=1, sticky='nsew')
 
 def add_expense():
-    global mainbalance, expense
-    value = int(input("Enter Expense:\n"))
-    mainbalance = mainbalance - value
-    expense = expense + value
+    #expense prompt
+    expense_prompt = tk.Toplevel(master = window)
+    expense_prompt.geometry('300x200')
+    expense_prompt.title("Entry pop")
+
+    expense_prompt.rowconfigure((0,1), weight=1, uniform='a')
+    expense_prompt.columnconfigure(0, weight=1, uniform='a')
+
+    expense_entry = tk.Entry(master=expense_prompt, font=('arial', 60))
+    expense_entry.grid(column=0,row=0, sticky='nsew')
+
+    def submit_expense():
+        global mainbalance, expense
+        value = float(expense_entry.get())
+        mainbalance = mainbalance - value
+        expense = expense + value
+        update_balance()
+        expense_prompt.destroy()
+
+    incom_submit = tk.Button(master=expense_prompt, text='Add Transactoin', command=submit_expense)
+    incom_submit.grid(column=0,row=1, sticky='nsew')
 
 
 
@@ -86,8 +134,8 @@ expense_value.grid(column=0, row=1, sticky="nsew")
 add_expense = tk.Button(master=expense_card, text="Add Expense", font=('arial', 10), bg="white", command=add_expense)
 add_expense.grid(column=0, row=2, sticky="nsew")
 
-cashFlo = tk.Label(master = frame1, text = "CashFlo", font = ('arial', 10), bg='orange')
-cashFlo.grid(column = 0, row = 2, columnspan = 2, sticky = 'nsew')
+cashflow_label = tk.Label(master = frame1, text = f"{cashflow}", font = ('arial', 10), bg='orange')
+cashflow_label.grid(column = 0, row = 2, columnspan = 2, sticky = 'nsew')
  
 
 #Transactions frame3
