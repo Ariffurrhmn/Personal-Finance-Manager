@@ -7,6 +7,7 @@ cashflow = 0
 accounts = ['Cash', 'Bank', 'Bkash','Saving']
 categories  = ['Food & Drinks', 'Health', 'Groceries','Transport', 'Bill & Fees']
 
+
 def update_cashflow():
     global cashflow, income, expense
     cashflow = income - expense
@@ -15,7 +16,6 @@ def update_cashflow():
     else:
         cashflow_label.config(text= f"-{cashflow} BDT", fg='red')
 
-
 def update_balance():
     balance.config(text = f"{mainbalance} BDT")
     income_value.config(text= f"{income} BDT")
@@ -23,50 +23,114 @@ def update_balance():
     update_cashflow()
 
 def add_income():
-    #Income prompt
-    income_prompt = tk.Toplevel(master = window)
-    income_prompt.geometry('300x200')
-    income_prompt.title("Entry pop")
+    income_prompt = tk.Toplevel(window)
+    income_prompt.geometry('400x350')
+    income_prompt.title("Add Income")
 
-    income_prompt.rowconfigure((0,1), weight=1, uniform='a')
+    income_prompt.rowconfigure((0,1), weight = 1, uniform='a')
+    income_prompt.rowconfigure(2, weight=2, uniform='a')
     income_prompt.columnconfigure(0, weight=1, uniform='a')
+    income_prompt.columnconfigure(1, weight=2, uniform='a')
 
-    incom_entry = tk.Entry(master=income_prompt, font=('arial', 60))
-    incom_entry.grid(column=0,row=0, sticky='nsew')
+    #account option
+    account_label = tk.Label(income_prompt, text="Account:", font = ('arial', 12))
+    account_label.grid(row = 0, column=0, sticky='e', padx=10, pady=5)
+    account_var = tk.StringVar()
+    account_menu = tk.OptionMenu(income_prompt, account_var, *accounts)
+    account_menu.grid(row = 0, column=1,  padx=10, pady=5)
 
+    # Description Entry
+    description_label = tk.Label(income_prompt, text="Description:", font=('arial', 12))
+    description_label.grid(row=1, column=0, sticky='e', padx=10, pady=5)
+    description_entry = tk.Entry(income_prompt, font=('arial', 12))
+    description_entry.grid(row=1, column=1, padx=10, pady=5)
+
+    # Amount Entry (Green background for Income)
+    amount_label = tk.Label(income_prompt, text="Amount:", font=('arial', 12))
+    amount_label.grid(row=2, column=0, sticky='e', padx=10, pady=5)
+    amount_entry = tk.Entry(income_prompt, font=('arial', 12), bg='lightgreen')  # Light green for income
+    amount_entry.grid(row=2, column=1, padx=10, pady=5)
+
+    #submit button
     def submit_income():
         global mainbalance, income
-        value = float(incom_entry.get())
-        mainbalance = value + mainbalance
-        income = income + value
-        update_balance()
-        income_prompt.destroy()
+        try:
+            amount = float(amount_entry.get())
+            account = account_var.get()
+            description = description_entry.get()
 
-    # incom_submit = tk.Button(master=income_prompt, text='Add Transactoin', command=submit_income)
-    # incom_submit.grid(column=0,row=1, sticky='nsew')
+            mainbalance += amount
+            income += amount
+            update_balance()
+
+            # Output to console
+            print(f"Income Added: Account: {account}, Description: {description}, Amount: {amount} BDT")
+
+            income_prompt.destroy()
+        except ValueError:
+            print("Please enter a valid amount.")
+
+    submit_button = tk.Button(income_prompt, text="Add Income", font=('arial', 12), command=submit_income, bg='green', fg='white')  # Green button
+    submit_button.grid(row=4, column=0, columnspan=2, pady=10)
 
 def add_expense():
-    #expense prompt
-    expense_prompt = tk.Toplevel(master = window)
-    expense_prompt.geometry('300x200')
-    expense_prompt.title("Entry pop")
+    expense_prompt = tk.Toplevel(window)
+    expense_prompt.geometry('400x350')
+    expense_prompt.title("Add Expense")
 
-    expense_prompt.rowconfigure((0,1), weight=1, uniform='a')
+    expense_prompt.rowconfigure((0, 1, 2), weight=1, uniform='a')
+    expense_prompt.rowconfigure(3, weight=2, uniform='a')
     expense_prompt.columnconfigure(0, weight=1, uniform='a')
+    expense_prompt.columnconfigure(1, weight=2, uniform='a')
 
-    expense_entry = tk.Entry(master=expense_prompt, font=('arial', 60))
-    expense_entry.grid(column=0,row=0, sticky='nsew')
+    # Category Dropdown
+    category_label = tk.Label(expense_prompt, text="Category:", font=('arial', 12))
+    category_label.grid(row=0, column=0, sticky='e', padx=10, pady=5)
+    category_var = tk.StringVar()
+    category_menu = tk.OptionMenu(expense_prompt, category_var, *categories)
+    category_menu.grid(row=0, column=1, padx=10, pady=5)
 
+    # Account Dropdown
+    account_label = tk.Label(expense_prompt, text="Account:", font=('arial', 12))
+    account_label.grid(row=1, column=0, sticky='e', padx=10, pady=5)
+    account_var = tk.StringVar()
+    account_menu = tk.OptionMenu(expense_prompt, account_var, *accounts)
+    account_menu.grid(row=1, column=1, padx=10, pady=5)
+
+    # Description Entry
+    description_label = tk.Label(expense_prompt, text="Description:", font=('arial', 12))
+    description_label.grid(row=2, column=0, sticky='e', padx=10, pady=5)
+    description_entry = tk.Entry(expense_prompt, font=('arial', 12))
+    description_entry.grid(row=2, column=1, padx=10, pady=5)
+
+    # Amount Entry (Red background for Expense)
+    amount_label = tk.Label(expense_prompt, text="Amount:", font=('arial', 12))
+    amount_label.grid(row=3, column=0, sticky='e', padx=10, pady=5)
+    amount_entry = tk.Entry(expense_prompt, font=('arial', 12), bg='lightcoral')  # Light red for expense
+    amount_entry.grid(row=3, column=1, padx=10, pady=5)
+
+    # Submit Button to add expense (Red Button)
     def submit_expense():
         global mainbalance, expense
-        value = float(expense_entry.get())
-        mainbalance = mainbalance - value
-        expense = expense + value
-        update_balance()
-        expense_prompt.destroy()
+        try:
+            amount = float(amount_entry.get())
+            category = category_var.get()
+            account = account_var.get()
+            description = description_entry.get()
 
-    incom_submit = tk.Button(master=expense_prompt, text='Add Transactoin', command=submit_expense)
-    incom_submit.grid(column=0,row=1, sticky='nsew')
+            mainbalance -= amount
+            expense += amount
+            update_balance()
+
+            # Output to console
+            print(f"Expense Added: Category: {category}, Account: {account}, Description: {description}, Amount: {amount} BDT")
+
+            expense_prompt.destroy()
+        except ValueError:
+            print("Please enter a valid amount.")
+
+    submit_button = tk.Button(expense_prompt, text="Add Expense", font=('arial', 12), command=submit_expense, bg='red', fg='white')  # Red button
+    submit_button.grid(row=4, column=0, columnspan=2, pady=10)
 
 
 
@@ -136,7 +200,16 @@ add_expense.grid(column=0, row=2, sticky="nsew")
 
 cashflow_label = tk.Label(master = frame1, text = f"{cashflow}", font = ('arial', 10), bg='orange')
 cashflow_label.grid(column = 0, row = 2, columnspan = 2, sticky = 'nsew')
- 
+
+#
+# 
+# 
+# 
+# 
+# 
+# 
+#  
+
 
 #Transactions frame3
 frame3.columnconfigure(0, weight=1, uniform='a')
@@ -206,5 +279,12 @@ actual_label.grid(column=2, row=0, sticky='nsew')
 
 remaining_label = tk.Label(master=budget_card, text="Remaining", fg="red", font=('Arial', 15), bg="lightgray", relief="groove")
 remaining_label.grid(column=3, row=0, sticky='nsew')
+
+#
+#
+#
+#
+#
+#
 
 window.mainloop()
