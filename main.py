@@ -212,27 +212,34 @@ cashflow_label.grid(column = 0, row = 2, columnspan = 2, sticky = 'nsew')
 
 
 #Transactions frame3
-frame3.columnconfigure(0, weight=1, uniform='a')
-frame3.rowconfigure((0,1,2,3,4), weight=1, uniform='a')
+# Transaction Box Frame
+transaction_snip = tk.Frame(master=frame3, relief="groove", bg="#f8f9fa", bd=1)
+transaction_snip.grid(column=0, row=0, sticky="nsew", padx=10, pady=10)
 
-transaction_snip = tk.Frame(master=frame3, relief="ridge", bg="gray")
-transaction_snip.grid(column=0,row=0, sticky="nsew")
+# Configure 2 rows: header + 1st transaction
+transaction_snip.rowconfigure((0, 1), weight=1, uniform='a')
+transaction_snip.columnconfigure((0, 1, 2), weight=1, uniform='a')
 
-transaction_snip.rowconfigure((0,1),weight=1,uniform='a')
-transaction_snip.columnconfigure((0,1),weight=1,uniform='a')
+# Headers
+category_header = tk.Label(transaction_snip, text="Category", bg="#dee2e6", font=('Arial', 12, 'bold'))
+category_header.grid(row=0, column=0, sticky="nsew", padx=1, pady=1)
 
-##########################
-Category = tk.Label(master=transaction_snip, text='Category', fg="goldenrod1", font=('arial', 15), bg="gray")
-Category.grid(column=0, row=0, sticky='nw')
+account_header = tk.Label(transaction_snip, text="Account", bg="#dee2e6", font=('Arial', 12, 'bold'))
+account_header.grid(row=0, column=1, sticky="nsew", padx=1, pady=1)
 
-account = tk.Label(master=transaction_snip, text='Account', fg="cyan2", font=('arial', 15), bg="gray")
-account.grid(column=0, row=0, sticky='ne')
+amount_header = tk.Label(transaction_snip, text="Amount", bg="#dee2e6", font=('Arial', 12, 'bold'))
+amount_header.grid(row=0, column=2, sticky="nsew", padx=1, pady=1)
 
-ammount = tk.Label(master=transaction_snip, text='$$$$', fg="green yellow", font=('arial', 15), bg="gray")
-ammount.grid(column=0, row=1, sticky='sw')
+# Example transaction row
+category_val = tk.Label(transaction_snip, text="Food & Drinks", bg="#ffffff", font=('Arial', 11))
+category_val.grid(row=1, column=0, sticky="nsew", padx=1, pady=1)
 
-tag = tk.Label(master=transaction_snip, text="'TAG'", fg="black", font=('arial', 15), bg="gray")
-tag.grid(column=1, row=1, sticky='nsew')
+account_val = tk.Label(transaction_snip, text="Bkash", bg="#ffffff", font=('Arial', 11))
+account_val.grid(row=1, column=1, sticky="nsew", padx=1, pady=1)
+
+amount_val = tk.Label(transaction_snip, text="500 BDT", bg="#ffffff", fg="green", font=('Arial', 11))
+amount_val.grid(row=1, column=2, sticky="nsew", padx=1, pady=1)
+
 
 
 # Goal-Tracker Frame2
