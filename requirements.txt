@@ -1,0 +1,24 @@
+# Finance Management Application Requirements
+# Python Standard Library modules used (no external dependencies required):
+# - tkinter (usually comes with Python)
+# - sqlite3 (built-in)
+# - hashlib (built-in)
+# - secrets (built-in)
+# - datetime (built-in)
+# - logging (built-in)
+# - typing (built-in for Python 3.5+)
+# - contextlib (built-in)
+# - tempfile (built-in)
+# - unittest (built-in)
+# - os (built-in)
+# - sys (built-in)
+# - re (built-in)
+
+# Optional development dependencies
+# pytest>=7.0.0          # Alternative testing framework
+# black>=22.0.0           # Code formatter  
+# flake8>=4.0.0           # Linting
+# mypy>=0.950             # Static type checking
+
+# No external runtime dependencies required!
+# This application is designed to run with Python's standard library only. 
