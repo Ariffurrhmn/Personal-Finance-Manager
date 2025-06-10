@@ -171,23 +171,3 @@ Found a bug? Have a feature idea? I'd love to hear from you!
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 💡 Future Ideas
-
-- [ ] Mobile app companion
-- [ ] Cloud sync option (while keeping local-first approach)
-- [ ] Investment tracking
-- [ ] Bill reminders
-- [ ] Multi-currency support
-- [ ] Data import from bank statements
-
-## 🙏 Acknowledgments
-
-- Built with love for anyone trying to get their finances in order
-- Inspired by the need for a simple, privacy-focused finance tracker
-- Special thanks to the Python community for amazing libraries
-
----
-
-**Ready to take control of your finances?** Download the app and start your journey toward financial clarity today! 🎉
-
-*Remember: The best finance app is the one you actually use. This one is designed to be simple enough for daily use, yet powerful enough to give you real insights into your money.* 
