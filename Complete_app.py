@@ -137,7 +137,40 @@ class ValidationError(Exception):
     """Custom exception for validation errors"""
     pass
 
-class User:
+class BaseModel:
+    """Base model class with common validation and utility methods"""
+    
+    def validate_name(self, name: str, field_name: str = "Name") -> None:
+        """Common name validation"""
+        if not name or len(name.strip()) == 0:
+            raise ValidationError(f"{field_name} is required")
+        if len(name) > VALIDATION['MAX_NAME_LENGTH']:
+            raise ValidationError(f"{field_name} must be less than {VALIDATION['MAX_NAME_LENGTH']} characters")
+    
+    def validate_user_id(self, user_id: int) -> None:
+        """Common user ID validation"""
+        if user_id <= 0:
+            raise ValidationError("Invalid user ID")
+    
+    def validate_amount(self, amount: float, field_name: str = "Amount") -> None:
+        """Common amount validation"""
+        if amount < 0:
+            raise ValidationError(f"{field_name} cannot be negative")
+        if amount > VALIDATION['MAX_AMOUNT']:
+            raise ValidationError(f"{field_name} cannot exceed {VALIDATION['MAX_AMOUNT']}")
+    
+    def validate_positive_amount(self, amount: float, field_name: str = "Amount") -> None:
+        """Validation for amounts that must be positive"""
+        if amount <= 0:
+            raise ValidationError(f"{field_name} must be positive")
+        if amount > VALIDATION['MAX_AMOUNT']:
+            raise ValidationError(f"{field_name} cannot exceed {VALIDATION['MAX_AMOUNT']}")
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Generic to_dict using object attributes"""
+        return {key: value for key, value in self.__dict__.items()}
+
+class User(BaseModel):
     """User model with validation"""
     
     def __init__(self, user_id: Optional[int] = None, name: str = "", 
@@ -150,11 +183,7 @@ class User:
     
     def validate(self) -> None:
         """Validate user data"""
-        if not self.name or len(self.name.strip()) == 0:
-            raise ValidationError("Name is required")
-        
-        if len(self.name) > VALIDATION['MAX_NAME_LENGTH']:
-            raise ValidationError(f"Name must be less than {VALIDATION['MAX_NAME_LENGTH']} characters")
+        self.validate_name(self.name)
         
         if not self.email or len(self.email.strip()) == 0:
             raise ValidationError("Email is required")
@@ -165,18 +194,8 @@ class User:
         
         if not self.password or len(self.password) < 6:
             raise ValidationError("Password must be at least 6 characters")
-    
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary"""
-        return {
-            'user_id': self.user_id,
-            'name': self.name,
-            'email': self.email,
-            'password': self.password,
-            'date_joined': self.date_joined
-        }
 
-class Account:
+class Account(BaseModel):
     """Account model with validation"""
     
     VALID_TYPES = ["Bank", "Cash", "Savings"]
@@ -191,32 +210,14 @@ class Account:
     
     def validate(self) -> None:
         """Validate account data"""
-        if not self.name or len(self.name.strip()) == 0:
-            raise ValidationError("Account name is required")
-        
-        if len(self.name) > VALIDATION['MAX_NAME_LENGTH']:
-            raise ValidationError(f"Account name must be less than {VALIDATION['MAX_NAME_LENGTH']} characters")
+        self.validate_name(self.name, "Account name")
+        self.validate_user_id(self.user_id)
+        self.validate_amount(self.balance, "Account balance")
         
         if self.account_type not in self.VALID_TYPES:
             raise ValidationError(f"Account type must be one of: {', '.join(self.VALID_TYPES)}")
-        
-        if self.balance < 0:
-            raise ValidationError("Account balance cannot be negative")
-        
-        if self.user_id <= 0:
-            raise ValidationError("Invalid user ID")
-    
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary"""
-        return {
-            'account_id': self.account_id,
-            'user_id': self.user_id,
-            'name': self.name,
-            'balance': self.balance,
-            'account_type': self.account_type
-        }
 
-class Category:
+class Category(BaseModel):
     """Category model with validation"""
     
     VALID_TYPES = ["Income", "Expense"]
@@ -230,28 +231,13 @@ class Category:
     
     def validate(self) -> None:
         """Validate category data"""
-        if not self.name or len(self.name.strip()) == 0:
-            raise ValidationError("Category name is required")
-        
-        if len(self.name) > VALIDATION['MAX_NAME_LENGTH']:
-            raise ValidationError(f"Category name must be less than {VALIDATION['MAX_NAME_LENGTH']} characters")
+        self.validate_name(self.name, "Category name")
+        self.validate_user_id(self.user_id)
         
         if self.category_type not in self.VALID_TYPES:
             raise ValidationError(f"Category type must be one of: {', '.join(self.VALID_TYPES)}")
-        
-        if self.user_id <= 0:
-            raise ValidationError("Invalid user ID")
-    
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary"""
-        return {
-            'category_id': self.category_id,
-            'user_id': self.user_id,
-            'name': self.name,
-            'category_type': self.category_type
-        }
 
-class Transaction:
+class Transaction(BaseModel):
     """Transaction model with validation"""
     
     VALID_TYPES = ["Income", "Expense", "Transfer"]
@@ -274,17 +260,11 @@ class Transaction:
     
     def validate(self) -> None:
         """Validate transaction data"""
-        if self.amount <= 0:
-            raise ValidationError("Transaction amount must be positive")
-        
-        if self.amount > VALIDATION['MAX_AMOUNT']:
-            raise ValidationError(f"Transaction amount cannot exceed {VALIDATION['MAX_AMOUNT']}")
+        self.validate_positive_amount(self.amount, "Transaction amount")
+        self.validate_user_id(self.user_id)
         
         if self.transaction_type not in self.VALID_TYPES:
             raise ValidationError(f"Transaction type must be one of: {', '.join(self.VALID_TYPES)}")
-        
-        if self.user_id <= 0:
-            raise ValidationError("Invalid user ID")
         
         if self.account_id <= 0:
             raise ValidationError("Invalid account ID")
@@ -299,23 +279,9 @@ class Transaction:
             raise ValidationError("Cannot transfer to the same account")
         
         if self.description and len(self.description) > VALIDATION['MAX_DESC_LENGTH']:
-            raise ValidationError(f"Description must be less than {VALIDATION['MAX_DESC_LENGTH']} characters")
-    
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary"""
-        return {
-            'transaction_id': self.transaction_id,
-            'user_id': self.user_id,
-            'account_id': self.account_id,
-            'category_id': self.category_id,
-            'amount': self.amount,
-            'description': self.description,
-            'transaction_type': self.transaction_type,
-            'to_account_id': self.to_account_id,
-            'date_created': self.date_created
-        } 
+            raise ValidationError(f"Description must be less than {VALIDATION['MAX_DESC_LENGTH']} characters") 
 
-class SavingGoal:
+class SavingGoal(BaseModel):
     """Saving goal model with validation"""
     
     def __init__(self, goal_id: Optional[int] = None, user_id: int = 0,
@@ -333,20 +299,10 @@ class SavingGoal:
     
     def validate(self) -> None:
         """Validate saving goal data"""
-        if not self.goal_name or len(self.goal_name.strip()) == 0:
-            raise ValidationError("Goal name is required")
-        
-        if len(self.goal_name) > VALIDATION['MAX_NAME_LENGTH']:
-            raise ValidationError(f"Goal name must be less than {VALIDATION['MAX_NAME_LENGTH']} characters")
-        
-        if self.target_amount < 0:
-            raise ValidationError("Target amount cannot be negative")
-        
-        if self.current_amount < 0:
-            raise ValidationError("Current amount cannot be negative")
-        
-        if self.user_id <= 0:
-            raise ValidationError("Invalid user ID")
+        self.validate_name(self.goal_name, "Goal name")
+        self.validate_user_id(self.user_id)
+        self.validate_amount(self.target_amount, "Target amount")
+        self.validate_amount(self.current_amount, "Current amount")
     
     def is_completed(self) -> bool:
         """Check if goal is completed"""
@@ -358,20 +314,7 @@ class SavingGoal:
             return 0.0
         return min((self.current_amount / self.target_amount) * 100, 100.0)
     
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary"""
-        return {
-            'goal_id': self.goal_id,
-            'user_id': self.user_id,
-            'goal_name': self.goal_name,
-            'target_amount': self.target_amount,
-            'current_amount': self.current_amount,
-            'account_id': self.account_id,
-            'is_default': self.is_default,
-            'date_created': self.date_created
-        }
-
-class Budget:
+class Budget(BaseModel):
     """Budget model with validation"""
     
     VALID_TIME_PERIODS = BUDGET_CONFIG['TIME_PERIODS']
@@ -410,17 +353,11 @@ class Budget:
     
     def validate(self) -> None:
         """Validate budget data"""
-        if self.budget_amount <= 0:
-            raise ValidationError("Budget amount must be positive")
-        
-        if self.budget_amount > VALIDATION['MAX_AMOUNT']:
-            raise ValidationError(f"Budget amount cannot exceed {VALIDATION['MAX_AMOUNT']}")
+        self.validate_positive_amount(self.budget_amount, "Budget amount")
+        self.validate_user_id(self.user_id)
         
         if self.time_period not in self.VALID_TIME_PERIODS:
             raise ValidationError(f"Time period must be one of: {', '.join(self.VALID_TIME_PERIODS)}")
-        
-        if self.user_id <= 0:
-            raise ValidationError("Invalid user ID")
         
         if self.category_id <= 0:
             raise ValidationError("Invalid category ID")
@@ -435,18 +372,7 @@ class Budget:
         remaining = (end_date - datetime.now()).days
         return max(0, remaining)
     
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary"""
-        return {
-            'budget_id': self.budget_id,
-            'user_id': self.user_id,
-            'category_id': self.category_id,
-            'budget_amount': self.budget_amount,
-            'time_period': self.time_period,
-            'start_date': self.start_date,
-            'end_date': self.end_date,
-            'date_created': self.date_created
-        }
+
 
 # =============================================================================
 # DATABASE LAYER
@@ -1609,26 +1535,62 @@ class PopupWindow:
         self.popup.transient(parent)
         self.popup.focus()
 
-class IncomePopup(PopupWindow):
-    """Income entry popup"""
+class PaginationHelper:
+    """Helper class for pagination logic"""
+    
+    def __init__(self, items_per_page: int = 10):
+        self.items_per_page = items_per_page
+        self.current_page = 0
+    
+    def get_page_items(self, all_items: List, page: int = None) -> List:
+        """Get items for current page"""
+        if page is not None:
+            self.current_page = page
+        start_idx = self.current_page * self.items_per_page
+        end_idx = start_idx + self.items_per_page
+        return all_items[start_idx:end_idx]
+    
+    def can_go_prev(self) -> bool:
+        """Check if can go to previous page"""
+        return self.current_page > 0
+    
+    def can_go_next(self, total_items: int) -> bool:
+        """Check if can go to next page"""
+        return (self.current_page + 1) * self.items_per_page < total_items
+    
+    def prev_page(self) -> int:
+        """Go to previous page"""
+        if self.can_go_prev():
+            self.current_page -= 1
+        return self.current_page
+    
+    def next_page(self, total_items: int) -> int:
+        """Go to next page"""
+        if self.can_go_next(total_items):
+            self.current_page += 1
+        return self.current_page
+
+class TransactionPopup(PopupWindow):
+    """Base class for transaction-related popups with common UI elements"""
     
     def __init__(self, parent: tk.Tk, database: Database, user: User, 
-                 accounts: List[Account], categories: List[Category],
-                 on_success: Callable[[], None]):
-        super().__init__(parent, "Add Income")
+                 accounts: List[Account], title: str, transaction_type: str,
+                 on_success: Callable[[], None], categories: Optional[List[Category]] = None):
+        super().__init__(parent, title)
         self.database = database
         self.user = user
         self.accounts = accounts
-        self.categories = [c for c in categories if c.category_type == "Income"]
+        self.transaction_type = transaction_type
         self.on_success = on_success
+        self.categories = categories or []
         
         self.amount_var = tk.StringVar()
-        self.setup_ui()
+        self.setup_common_ui()
     
-    def setup_ui(self):
-        """Setup income popup UI"""
+    def setup_common_ui(self):
+        """Setup common UI elements for transaction popups"""
         # Configure grid
-        for i in range(4):
+        for i in range(5):
             self.popup.grid_rowconfigure(i, weight=1 if i in [0, 3] else 0)
         self.popup.grid_columnconfigure(0, weight=0)
         self.popup.grid_columnconfigure(1, weight=1)
@@ -1648,6 +1610,34 @@ class IncomePopup(PopupWindow):
         self.account_combo = ttk.Combobox(self.popup, values=account_names, state="readonly")
         self.account_combo.grid(row=1, column=1, sticky="nsew", ipady=3)
         
+        # Setup additional fields based on transaction type
+        self.setup_specific_fields()
+        
+        # Submit button
+        submit_btn = tk.Button(self.popup, text="SUBMIT", bg=COLORS['BLACK'], 
+                              fg=COLORS['WHITE'], font=FONTS['POPUP_SUBMIT'], 
+                              relief='flat', command=self.submit)
+        submit_btn.grid(row=4, column=0, columnspan=2, sticky="nsew", ipady=3)
+    
+    def setup_specific_fields(self):
+        """Override this method to setup specific fields for each transaction type"""
+        pass
+    
+    def submit(self):
+        """Submit transaction - override in subclasses"""
+        pass
+
+class IncomePopup(TransactionPopup):
+    """Income entry popup"""
+    
+    def __init__(self, parent: tk.Tk, database: Database, user: User, 
+                 accounts: List[Account], categories: List[Category],
+                 on_success: Callable[[], None]):
+        income_categories = [c for c in categories if c.category_type == "Income"]
+        super().__init__(parent, database, user, accounts, "Add Income", "Income", on_success, income_categories)
+    
+    def setup_specific_fields(self):
+        """Setup income-specific fields"""
         # Category dropdown
         category_label = tk.Label(self.popup, text="Category", anchor='w',
                                  font=FONTS['POPUP_LABEL'], bg=COLORS['WHITE'])
@@ -1664,12 +1654,6 @@ class IncomePopup(PopupWindow):
         
         self.desc_entry = tk.Entry(self.popup)
         self.desc_entry.grid(row=3, column=1, sticky="nsew", ipady=3)
-        
-        # Submit button
-        submit_btn = tk.Button(self.popup, text="SUBMIT", bg=COLORS['BLACK'], 
-                              fg=COLORS['WHITE'], font=FONTS['POPUP_SUBMIT'], 
-                              relief='flat', command=self.submit)
-        submit_btn.grid(row=4, column=0, columnspan=2, sticky="nsew", ipady=3)
     
     def submit(self):
         """Submit income transaction"""
@@ -1711,45 +1695,17 @@ class IncomePopup(PopupWindow):
         except DatabaseError as e:
             messagebox.showerror("Database Error", str(e))
 
-class ExpensePopup(PopupWindow):
+class ExpensePopup(TransactionPopup):
     """Expense entry popup"""
     
     def __init__(self, parent: tk.Tk, database: Database, user: User,
                  accounts: List[Account], categories: List[Category],
                  on_success: Callable[[], None]):
-        super().__init__(parent, "Add Expense")
-        self.database = database
-        self.user = user
-        self.accounts = accounts
-        self.categories = [c for c in categories if c.category_type == "Expense"]
-        self.on_success = on_success
-        
-        self.amount_var = tk.StringVar()
-        self.setup_ui()
+        expense_categories = [c for c in categories if c.category_type == "Expense"]
+        super().__init__(parent, database, user, accounts, "Add Expense", "Expense", on_success, expense_categories)
     
-    def setup_ui(self):
-        """Setup expense popup UI"""
-        # Same layout as IncomePopup
-        for i in range(4):
-            self.popup.grid_rowconfigure(i, weight=1 if i in [0, 3] else 0)
-        self.popup.grid_columnconfigure(0, weight=0)
-        self.popup.grid_columnconfigure(1, weight=1)
-        
-        # Amount entry
-        amount_entry = tk.Entry(self.popup, textvariable=self.amount_var,
-                               font=FONTS['POPUP_AMOUNT'], justify='left')
-        amount_entry.grid(row=0, column=0, columnspan=2, sticky="nsew", ipady=0)
-        amount_entry.focus()
-        
-        # Account dropdown
-        account_label = tk.Label(self.popup, text="Account", anchor='w',
-                                font=FONTS['POPUP_LABEL'], bg=COLORS['WHITE'])
-        account_label.grid(row=1, column=0, sticky="nsew", ipadx=3, ipady=3)
-        
-        account_names = [f"{acc.name} ({acc.account_type})" for acc in self.accounts]
-        self.account_combo = ttk.Combobox(self.popup, values=account_names, state="readonly")
-        self.account_combo.grid(row=1, column=1, sticky="nsew", ipady=3)
-        
+    def setup_specific_fields(self):
+        """Setup expense-specific fields"""
         # Category dropdown
         category_label = tk.Label(self.popup, text="Category", anchor='w',
                                  font=FONTS['POPUP_LABEL'], bg=COLORS['WHITE'])
@@ -1766,12 +1722,6 @@ class ExpensePopup(PopupWindow):
         
         self.desc_entry = tk.Entry(self.popup)
         self.desc_entry.grid(row=3, column=1, sticky="nsew", ipady=3)
-        
-        # Submit button
-        submit_btn = tk.Button(self.popup, text="SUBMIT", bg=COLORS['BLACK'],
-                              fg=COLORS['WHITE'], font=FONTS['POPUP_SUBMIT'],
-                              relief='flat', command=self.submit)
-        submit_btn.grid(row=4, column=0, columnspan=2, sticky="nsew", ipady=5)
     
     def submit(self):
         """Submit expense transaction"""
@@ -3772,29 +3722,35 @@ class MainApp:
             return
         BudgetPopup(self.parent, self.database, self.user, self.categories, self.refresh_data)
 
+    def navigate_page(self, page_type: str, direction: str):
+        """Generic method to navigate pages"""
+        if page_type == "goals":
+            if direction == "prev" and self.goals_current_page > 0:
+                self.goals_current_page -= 1
+                self.refresh_saving_goals()
+            elif direction == "next" and self.goals_current_page < self.goals_total_pages - 1:
+                self.goals_current_page += 1
+                self.refresh_saving_goals()
+        elif page_type == "budgets":
+            if direction == "prev" and self.budgets_current_page > 0:
+                self.budgets_current_page -= 1
+                self.refresh_budgets()
+            elif direction == "next" and self.budgets_current_page < self.budgets_total_pages - 1:
+                self.budgets_current_page += 1
+                self.refresh_budgets()
+    
+    # Convenience methods
     def prev_goals_page(self):
-        """Go to previous page of saving goals"""
-        if self.goals_current_page > 0:
-            self.goals_current_page -= 1
-            self.refresh_saving_goals()
-
+        self.navigate_page("goals", "prev")
+    
     def next_goals_page(self):
-        """Go to next page of saving goals"""
-        if self.goals_current_page < self.goals_total_pages - 1:
-            self.goals_current_page += 1
-            self.refresh_saving_goals()
-
+        self.navigate_page("goals", "next")
+    
     def prev_budgets_page(self):
-        """Go to previous page of budgets"""
-        if self.budgets_current_page > 0:
-            self.budgets_current_page -= 1
-            self.refresh_budgets()
-
+        self.navigate_page("budgets", "prev")
+    
     def next_budgets_page(self):
-        """Go to next page of budgets"""
-        if self.budgets_current_page < self.budgets_total_pages - 1:
-            self.budgets_current_page += 1
-            self.refresh_budgets()
+        self.navigate_page("budgets", "next")
 
     def add_saving_goal(self):
         """Add a new saving goal"""
