@@ -174,5 +174,5 @@ This project is developed for educational purposes as part of coursework require
 
 ---
 
-**Developed by Team Personal Finance Manager**  
+**Developed by Team Code Ghibli**  
 *Making personal finance management accessible and effective for everyone* 
