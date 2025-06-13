@@ -35,8 +35,6 @@ DB_BACKUP_PATH = "finance_app_backup.db"
 WINDOW_SIZE = "1024x768"
 WINDOW_TITLE = "Finance Management"
 
-# Asset paths - icons removed per user request
-
 # Color scheme
 COLORS = {
     'FRAME_BG': "#000000",
@@ -53,29 +51,31 @@ COLORS = {
     'DARK_GREY': "#D0D0D0"
 }
 
-# Font configuration
+# Font configuration with Arial fallback
+FONT_FAMILY = ('inter', 'Arial')  # Try inter first, then Arial
+
 FONTS = {
-    'FAMILY': 'inter',
-    'BALANCE': ('inter', 36, 'bold'),
-    'HEADER': ('inter', 22, 'bold'),
-    'SECTION_LABEL': ('inter', 13, 'italic'),
-    'VALUE': ('inter', 16, 'bold'),
-    'BUTTON': ('inter', 11, 'bold'),
-    'TRANSACTION_DESC': ('inter', 12, 'bold'),
-    'TRANSACTION_SUB': ('inter', 10, 'italic'),
-    'TRANSACTION_AMOUNT': ('inter', 14, 'bold'),
-    'TRANSACTION_DATE': ('inter', 9, 'normal'),
-    'POPUP_AMOUNT': ('inter', 50, 'normal'),
-    'POPUP_LABEL': ('inter', 10, 'italic'),
-    'POPUP_SUBMIT': ('inter', 22, 'bold'),
-    'LOGIN_TITLE': ('inter', 32, 'bold'),
-    'LOGIN_INPUT': ('inter', 14, 'normal'),
-    'LOGIN_BUTTON': ('inter', 16, 'bold'),
-    'WELCOME': ('inter', 12, 'normal'),
-    'LOGOUT': ('inter', 10, 'bold'),
-    'LIST_ITEM': ('inter', 13, 'normal'),
-    'FORM_LABEL': ('inter', 11, 'normal'),
-    'FORM_HEADER': ('inter', 16, 'bold')
+    'FAMILY': FONT_FAMILY,
+    'BALANCE': (FONT_FAMILY, 36, 'bold'),
+    'HEADER': (FONT_FAMILY, 22, 'bold'),
+    'SECTION_LABEL': (FONT_FAMILY, 13, 'italic'),
+    'VALUE': (FONT_FAMILY, 16, 'bold'),
+    'BUTTON': (FONT_FAMILY, 11, 'bold'),
+    'TRANSACTION_DESC': (FONT_FAMILY, 12, 'bold'),
+    'TRANSACTION_SUB': (FONT_FAMILY, 10, 'italic'),
+    'TRANSACTION_AMOUNT': (FONT_FAMILY, 14, 'bold'),
+    'TRANSACTION_DATE': (FONT_FAMILY, 9, 'normal'),
+    'POPUP_AMOUNT': (FONT_FAMILY, 50, 'normal'),
+    'POPUP_LABEL': (FONT_FAMILY, 10, 'italic'),
+    'POPUP_SUBMIT': (FONT_FAMILY, 22, 'bold'),
+    'LOGIN_TITLE': (FONT_FAMILY, 32, 'bold'),
+    'LOGIN_INPUT': (FONT_FAMILY, 14, 'normal'),
+    'LOGIN_BUTTON': (FONT_FAMILY, 16, 'bold'),
+    'WELCOME': (FONT_FAMILY, 12, 'normal'),
+    'LOGOUT': (FONT_FAMILY, 10, 'bold'),
+    'LIST_ITEM': (FONT_FAMILY, 13, 'normal'),
+    'FORM_LABEL': (FONT_FAMILY, 11, 'normal'),
+    'FORM_HEADER': (FONT_FAMILY, 16, 'bold')
 }
 
 # Security configuration
@@ -133,121 +133,119 @@ DEFAULT_SAVING_GOAL = {
 # MODELS
 # =============================================================================
 
+# Keep this for compatibility with existing code
 class ValidationError(Exception):
-    """Custom exception for validation errors"""
+    """Simple validation error"""
     pass
 
-class BaseModel:
-    """Base model class with common validation and utility methods"""
-    
-    def validate_name(self, name: str, field_name: str = "Name") -> None:
-        """Common name validation"""
-        if not name or len(name.strip()) == 0:
-            raise ValidationError(f"{field_name} is required")
-        if len(name) > VALIDATION['MAX_NAME_LENGTH']:
-            raise ValidationError(f"{field_name} must be less than {VALIDATION['MAX_NAME_LENGTH']} characters")
-    
-    def validate_user_id(self, user_id: int) -> None:
-        """Common user ID validation"""
-        if user_id <= 0:
-            raise ValidationError("Invalid user ID")
-    
-    def validate_amount(self, amount: float, field_name: str = "Amount") -> None:
-        """Common amount validation"""
-        if amount < 0:
-            raise ValidationError(f"{field_name} cannot be negative")
-        if amount > VALIDATION['MAX_AMOUNT']:
-            raise ValidationError(f"{field_name} cannot exceed {VALIDATION['MAX_AMOUNT']}")
-    
-    def validate_positive_amount(self, amount: float, field_name: str = "Amount") -> None:
-        """Validation for amounts that must be positive"""
-        if amount <= 0:
-            raise ValidationError(f"{field_name} must be positive")
-        if amount > VALIDATION['MAX_AMOUNT']:
-            raise ValidationError(f"{field_name} cannot exceed {VALIDATION['MAX_AMOUNT']}")
-    
-    def to_dict(self) -> Dict[str, Any]:
-        """Generic to_dict using object attributes"""
-        return {key: value for key, value in self.__dict__.items()}
+class DatabaseError(Exception):
+    """Simple database error"""
+    pass
 
-class User(BaseModel):
-    """User model with validation"""
+# Simple validation helpers
+def is_valid_name(name):
+    """Check if name is valid"""
+    if not name or len(name.strip()) == 0:
+        return False
+    if len(name) > 100:  # Simple limit
+        return False
+    return True
+
+def is_valid_email(email):
+    """Check if email looks valid"""
+    if not email or "@" not in email or "." not in email:
+        return False
+    return True
+
+def is_valid_amount(amount):
+    """Check if amount is valid"""
+    if amount < 0 or amount > 999999999:
+        return False
+    return True
+
+def is_positive_amount(amount):
+    """Check if amount is positive"""
+    return amount > 0
+
+class User:
+    """Simple user class"""
     
-    def __init__(self, user_id: Optional[int] = None, name: str = "", 
-                 email: str = "", password: str = "", date_joined: Optional[str] = None):
+    def __init__(self, user_id=None, name="", email="", password="", date_joined=None):
         self.user_id = user_id
         self.name = name
         self.email = email
         self.password = password
         self.date_joined = date_joined or datetime.now().isoformat()
     
-    def validate(self) -> None:
-        """Validate user data"""
-        self.validate_name(self.name)
+    def is_valid(self):
+        """Check if user data is valid"""
+        if not is_valid_name(self.name):
+            return False, "Name is required"
         
-        if not self.email or len(self.email.strip()) == 0:
-            raise ValidationError("Email is required")
-        
-        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-        if not re.match(email_pattern, self.email):
-            raise ValidationError("Invalid email format")
+        if not is_valid_email(self.email):
+            return False, "Invalid email"
         
         if not self.password or len(self.password) < 6:
-            raise ValidationError("Password must be at least 6 characters")
+            return False, "Password too short"
+            
+        return True, "OK"
 
-class Account(BaseModel):
-    """Account model with validation"""
+class Account:
+    """Simple account class"""
     
-    VALID_TYPES = ["Bank", "Cash", "Savings"]
-    
-    def __init__(self, account_id: Optional[int] = None, user_id: int = 0,
-                 name: str = "", balance: float = 0.0, account_type: str = "Bank"):
+    def __init__(self, account_id=None, user_id=0, name="", balance=0.0, account_type="Bank"):
         self.account_id = account_id
         self.user_id = user_id
         self.name = name
         self.balance = balance
         self.account_type = account_type
     
-    def validate(self) -> None:
-        """Validate account data"""
-        self.validate_name(self.name, "Account name")
-        self.validate_user_id(self.user_id)
-        self.validate_amount(self.balance, "Account balance")
+    def is_valid(self):
+        """Check if account data is valid"""
+        if not is_valid_name(self.name):
+            return False, "Account name required"
         
-        if self.account_type not in self.VALID_TYPES:
-            raise ValidationError(f"Account type must be one of: {', '.join(self.VALID_TYPES)}")
+        if self.user_id <= 0:
+            return False, "Invalid user"
+        
+        if not is_valid_amount(self.balance):
+            return False, "Invalid balance"
+        
+        valid_types = ["Bank", "Cash", "Savings"]
+        if self.account_type not in valid_types:
+            return False, "Invalid account type"
+            
+        return True, "OK"
 
-class Category(BaseModel):
-    """Category model with validation"""
+class Category:
+    """Simple category class"""
     
-    VALID_TYPES = ["Income", "Expense"]
-    
-    def __init__(self, category_id: Optional[int] = None, user_id: int = 0,
-                 name: str = "", category_type: str = "Expense"):
+    def __init__(self, category_id=None, user_id=0, name="", category_type="Expense"):
         self.category_id = category_id
         self.user_id = user_id
         self.name = name
         self.category_type = category_type
     
-    def validate(self) -> None:
-        """Validate category data"""
-        self.validate_name(self.name, "Category name")
-        self.validate_user_id(self.user_id)
+    def is_valid(self):
+        """Check if category data is valid"""
+        if not is_valid_name(self.name):
+            return False, "Category name required"
         
-        if self.category_type not in self.VALID_TYPES:
-            raise ValidationError(f"Category type must be one of: {', '.join(self.VALID_TYPES)}")
+        if self.user_id <= 0:
+            return False, "Invalid user"
+        
+        valid_types = ["Income", "Expense"]
+        if self.category_type not in valid_types:
+            return False, "Invalid category type"
+            
+        return True, "OK"
 
-class Transaction(BaseModel):
-    """Transaction model with validation"""
+class Transaction:
+    """Simple transaction class"""
     
-    VALID_TYPES = ["Income", "Expense", "Transfer"]
-    
-    def __init__(self, transaction_id: Optional[int] = None, user_id: int = 0,
-                 account_id: int = 0, category_id: Optional[int] = None,
-                 amount: float = 0.0, description: str = "", 
-                 transaction_type: str = "Expense", 
-                 to_account_id: Optional[int] = None,
-                 date_created: Optional[str] = None):
+    def __init__(self, transaction_id=None, user_id=0, account_id=0, category_id=None,
+                 amount=0.0, description="", transaction_type="Expense", 
+                 to_account_id=None):
         self.transaction_id = transaction_id
         self.user_id = user_id
         self.account_id = account_id
@@ -256,32 +254,46 @@ class Transaction(BaseModel):
         self.description = description
         self.transaction_type = transaction_type
         self.to_account_id = to_account_id
-        self.date_created = date_created or datetime.now().isoformat()
+        self.date_created = datetime.now().isoformat()
     
-    def validate(self) -> None:
-        """Validate transaction data"""
-        self.validate_positive_amount(self.amount, "Transaction amount")
-        self.validate_user_id(self.user_id)
+    def is_valid(self):
+        """Check if transaction data is valid"""
+        # Amount must be positive
+        if not is_positive_amount(self.amount):
+            return False, "Amount must be positive"
         
-        if self.transaction_type not in self.VALID_TYPES:
-            raise ValidationError(f"Transaction type must be one of: {', '.join(self.VALID_TYPES)}")
+        # Must have valid user
+        if self.user_id <= 0:
+            return False, "Invalid user"
         
+        # Must have valid account
         if self.account_id <= 0:
-            raise ValidationError("Invalid account ID")
+            return False, "Invalid account"
         
+        # Check transaction type
+        valid_types = ["Income", "Expense", "Transfer"]
+        if self.transaction_type not in valid_types:
+            return False, "Invalid transaction type"
+        
+        # Income/Expense need category
         if self.transaction_type in ["Income", "Expense"] and not self.category_id:
-            raise ValidationError("Category is required for income and expense transactions")
+            return False, "Category required"
         
+        # Transfer needs destination account
         if self.transaction_type == "Transfer" and not self.to_account_id:
-            raise ValidationError("Destination account is required for transfers")
+            return False, "Destination account required"
         
+        # Can't transfer to same account
         if self.transaction_type == "Transfer" and self.account_id == self.to_account_id:
-            raise ValidationError("Cannot transfer to the same account")
+            return False, "Cannot transfer to same account"
         
-        if self.description and len(self.description) > VALIDATION['MAX_DESC_LENGTH']:
-            raise ValidationError(f"Description must be less than {VALIDATION['MAX_DESC_LENGTH']} characters") 
+        # Description length check
+        if self.description and len(self.description) > 200:
+            return False, "Description too long"
+            
+        return True, "OK" 
 
-class SavingGoal(BaseModel):
+class SavingGoal:
     """Saving goal model with validation"""
     
     def __init__(self, goal_id: Optional[int] = None, user_id: int = 0,
@@ -297,12 +309,21 @@ class SavingGoal(BaseModel):
         self.is_default = is_default
         self.date_created = date_created or datetime.now().isoformat()
     
-    def validate(self) -> None:
-        """Validate saving goal data"""
-        self.validate_name(self.goal_name, "Goal name")
-        self.validate_user_id(self.user_id)
-        self.validate_amount(self.target_amount, "Target amount")
-        self.validate_amount(self.current_amount, "Current amount")
+    def is_valid(self):
+        """Check if saving goal data is valid"""
+        if not is_valid_name(self.goal_name):
+            return False, "Goal name required"
+        
+        if self.user_id <= 0:
+            return False, "Invalid user"
+        
+        if not is_valid_amount(self.target_amount):
+            return False, "Invalid target amount"
+        
+        if not is_valid_amount(self.current_amount):
+            return False, "Invalid current amount"
+            
+        return True, "OK"
     
     def is_completed(self) -> bool:
         """Check if goal is completed"""
@@ -314,7 +335,7 @@ class SavingGoal(BaseModel):
             return 0.0
         return min((self.current_amount / self.target_amount) * 100, 100.0)
     
-class Budget(BaseModel):
+class Budget:
     """Budget model with validation"""
     
     VALID_TIME_PERIODS = BUDGET_CONFIG['TIME_PERIODS']
@@ -351,16 +372,22 @@ class Budget(BaseModel):
         
         return end.isoformat()
     
-    def validate(self) -> None:
-        """Validate budget data"""
-        self.validate_positive_amount(self.budget_amount, "Budget amount")
-        self.validate_user_id(self.user_id)
+    def is_valid(self):
+        """Check if budget data is valid"""
+        if not is_positive_amount(self.budget_amount):
+            return False, "Budget amount must be positive"
         
-        if self.time_period not in self.VALID_TIME_PERIODS:
-            raise ValidationError(f"Time period must be one of: {', '.join(self.VALID_TIME_PERIODS)}")
+        if self.user_id <= 0:
+            return False, "Invalid user"
+        
+        valid_periods = ['Week', 'Month', 'Year']
+        if self.time_period not in valid_periods:
+            return False, "Invalid time period"
         
         if self.category_id <= 0:
-            raise ValidationError("Invalid category ID")
+            return False, "Invalid category"
+            
+        return True, "OK"
     
     def is_expired(self) -> bool:
         """Check if budget period has expired"""
@@ -389,9 +416,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-class DatabaseError(Exception):
-    """Custom exception for database errors"""
-    pass
+# Removed duplicate DatabaseError - already defined above
 
 class Database:
     """Database management class with full CRUD operations"""
@@ -576,7 +601,9 @@ class Database:
     
     def create_user(self, user: User) -> int:
         """Create a new user"""
-        user.validate()
+        is_valid, error_msg = user.is_valid()
+        if not is_valid:
+            raise ValidationError(error_msg)
         
         try:
             with self.get_connection() as conn:
@@ -678,7 +705,9 @@ class Database:
     
     def create_account(self, account: Account) -> int:
         """Create a new account"""
-        account.validate()
+        is_valid, error_msg = account.is_valid()
+        if not is_valid:
+            raise ValidationError(error_msg)
         
         with self.get_connection() as conn:
             cursor = conn.cursor()
@@ -729,7 +758,9 @@ class Database:
     
     def create_category(self, category: Category) -> int:
         """Create a new category"""
-        category.validate()
+        is_valid, error_msg = category.is_valid()
+        if not is_valid:
+            raise ValidationError(error_msg)
         
         with self.get_connection() as conn:
             cursor = conn.cursor()
@@ -770,7 +801,9 @@ class Database:
     
     def create_transaction(self, transaction: Transaction) -> int:
         """Create a new transaction and update account balances"""
-        transaction.validate()
+        is_valid, error_msg = transaction.is_valid()
+        if not is_valid:
+            raise ValidationError(error_msg)
         
         with self.get_connection() as conn:
             cursor = conn.cursor()
@@ -947,7 +980,9 @@ class Database:
     
     def create_saving_goal(self, goal: SavingGoal) -> int:
         """Create a new saving goal and associated saving account"""
-        goal.validate()
+        is_valid, error_msg = goal.is_valid()
+        if not is_valid:
+            raise ValidationError(error_msg)
         
         with self.get_connection() as conn:
             cursor = conn.cursor()
@@ -1093,7 +1128,9 @@ class Database:
     
     def create_budget(self, budget: Budget) -> int:
         """Create a new budget"""
-        budget.validate()
+        is_valid, error_msg = budget.is_valid()
+        if not is_valid:
+            raise ValidationError(error_msg)
         
         with self.get_connection() as conn:
             cursor = conn.cursor()
@@ -4466,9 +4503,7 @@ class FinanceApp:
             self.main_root.title(WINDOW_TITLE)
             self.main_root.geometry(WINDOW_SIZE)
             self.main_root.resizable(True, True)
-            
-            # Window icon removed per user request
-            
+                        
             # Set up window close handler
             self.main_root.protocol("WM_DELETE_WINDOW", self.on_closing)
             
