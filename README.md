@@ -39,8 +39,7 @@ A comprehensive personal finance management application built with Python and Tk
   - Budget Analysis
   - Complete Financial Overview
 - **Visual Charts**: Interactive charts for better data visualization
-- **PDF Export**: Generate and save detailed financial reports
-- **Date Range Filtering**: Customize reports for specific time periods
+
 
 ### 🏷️ Category Management
 - **Income & Expense Categories**: Organize transactions by type
@@ -141,8 +140,6 @@ pip install matplotlib reportlab
 
 ### Data Visualization
 - **Matplotlib Integration**: Charts and graphs for financial analysis
-- **ReportLab**: Professional PDF report generation
-- **Interactive Elements**: Clickable charts and progress bars
 
 ## File Structure
 ```
@@ -214,17 +211,5 @@ For support, please:
 1. Check the troubleshooting section above
 2. Review the code comments for implementation details
 3. Open an issue with detailed error information
-
-## Roadmap
-
-Future enhancements may include:
-- Data import/export features
-- Mobile app companion
-- Cloud synchronization
-- Advanced reporting features
-- Investment tracking
-- Recurring transaction automation
-
----
 
 **Made with ❤️ for better financial management** 
