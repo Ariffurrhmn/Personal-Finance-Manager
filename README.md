@@ -1,75 +1,125 @@
 # Personal Finance Manager
 
-A comprehensive personal finance management application built with Python and Tkinter. Track your income, expenses, savings goals, and budgets all in one place with an intuitive graphical interface.
+A comprehensive desktop application built with Python and Tkinter to help individuals track their income, expenses, and savings while promoting financial literacy and better money management.
+
+## Team Members
+
+| Name | Student ID | Role |
+|------|------------|------|
+| **Arifur Rahman** | 20234103222 | Developer - Full implementation of UI and backend code integration |
+| **Sumi Akter** | 20234103255 | Database Administrator - Database design, queries, and data management |
+| **Akhi Akter** | 20234103212 | UI/UX Designer - Visual interface design and user experience |
+| **Sheikh Md. Fahad** | 20234103238 | QA Specialist - Quality assurance, testing, and improvement feedback |
+| **Parvez Hasan Sharif** | 20234103228 | Report Generation Specialist - Financial data structure and display |
+
+## Project Motivation
+
+This project was initially suggested by our course instructor to build a basic personal finance tracker. However, our motivation grew stronger after observing how financial challenges affect students in real life. Many students living independently on limited incomes struggled to manage money effectively.
+
+The project was inspired by the real need for a tool that promotes better financial habits. By allowing users to track income, expenses, and savings, the app helps people gain clearer understanding of their financial health. The savings section was specifically added to encourage financial discipline, separating saved amounts from daily spending.
+
+Our goal is to make personal finance less overwhelming and more manageable for everyone.
 
 ## Features
 
-### 🔐 User Management
-- **Secure Authentication**: User registration and login with password hashing
-- **Multi-user Support**: Each user has their own isolated financial data
+### 🔐 User Registration and Authentication
+- Secure user login and registration system
+- Email verification and password hashing for data protection
+- Multi-user support with individual data isolation
 
 ### 💰 Account Management
-- **Multiple Account Types**: Bank, Cash, and Savings accounts
-- **Real-time Balance Tracking**: View total balance across all accounts
-- **Account Operations**: Create, view, and delete accounts
+- Create, edit, and delete different account types (Bank, Cash, Savings)
+- Real-time balance tracking across all accounts
+- Account categorization for better organization
 
 ### 📊 Transaction Management
-- **Income Tracking**: Record income with categories and descriptions
-- **Expense Tracking**: Track expenses by category with detailed records
-- **Money Transfers**: Transfer funds between accounts
-- **Transaction History**: Paginated view of all transactions with search
+- Comprehensive income and expense tracking
+- Add, edit, and delete transactions with detailed categorization
+- Support for transfers between accounts
+- Transaction history with search and filter capabilities
 
-### 🎯 Savings Goals
-- **Goal Setting**: Set target amounts for savings goals
-- **Progress Tracking**: Visual progress bars and percentage completion
-- **Goal Completion**: Celebrate achievements with completion notifications
-- **Flexible Management**: Convert completed goals to regular accounts or delete them
+### 📈 Budget Management
+- Set up budgets for specific categories
+- Track spending progress against budget limits
+- Visual indicators for budget status (under/over budget)
+- Monthly and custom period budget tracking
 
-### 📋 Budget Management
-- **Category Budgets**: Set spending limits for different categories
-- **Time Periods**: Monthly, weekly, or custom date range budgets
-- **Budget Monitoring**: Real-time tracking of budget vs. actual spending
-- **Warnings & Alerts**: Get notified when approaching or exceeding budget limits
+### 🎯 Saving Goals
+- Create and monitor saving goals
+- Progress tracking towards goal completion
+- Visual progress indicators
+- Goal deadline management
 
-### 📈 Financial Reports
-- **Multiple Report Types**:
-  - Monthly Summary
-  - Category Analysis
-  - Account Performance
-  - Budget Analysis
-  - Complete Financial Overview
-- **Visual Charts**: Interactive charts for better data visualization
+### 📋 Reports Generation
+- Monthly income and expense reports
+- Category-wise spending analysis
+- Visual charts and graphs using Matplotlib
+- Export capabilities for financial data
 
+### 🎨 Modern UI/UX
+- Clean, intuitive interface designed for ease of use
+- Responsive design with proper font fallback system
+- Color-coded elements for better visual organization
+- User-friendly navigation and workflow
 
-### 🏷️ Category Management
-- **Income & Expense Categories**: Organize transactions by type
-- **Custom Categories**: Create categories that fit your lifestyle
-- **Category Analysis**: Track spending patterns by category
+## Technical Stack
 
-## Installation
+### Programming Language
+- **Python 3** - Complete application development including UI, backend, and database interactions
+
+### UI Framework
+- **Tkinter** - Cross-platform GUI framework for desktop application interface
+
+### Database
+- **SQLite** - Lightweight relational database for storing:
+  - User accounts and authentication data
+  - Financial accounts and transaction history
+  - Categories, budgets, and saving goals
+  - Application logs and preferences
+
+### Data Visualization
+- **Matplotlib** - Chart generation and financial data visualization for reports and analytics
+
+### Security
+- **Hashlib & Secrets** - Password hashing with salt encryption for secure user authentication
+
+### Development Environment
+- **VS Code** - Primary IDE for development, testing, and debugging
+
+## Database Structure
+
+The application uses a normalized SQLite database with the following tables:
+
+- **User** - User accounts with hashed passwords
+- **Account** - Financial accounts (checking, savings, etc.)
+- **Category** - Transaction categories for organization
+- **Transactions** - All financial transactions with type classification
+- **SavingGoal** - User-defined savings targets
+- **Budget** - Category-based budget limits
+
+## Installation & Setup
 
 ### Prerequisites
 - Python 3.7 or higher
-- pip (Python package installer)
+- Required Python packages (automatically installed):
+  - tkinter (usually included with Python)
+  - matplotlib
+  - sqlite3 (included with Python)
 
-### Required Libraries
-```bash
-pip install matplotlib reportlab
-```
+### Installation Steps
 
-### Quick Start
-1. **Download the application**:
+1. **Clone or download the repository:**
    ```bash
-   git clone <repository-url>
+   git clone [repository-url]
    cd Personal-Finance-Manager
    ```
 
-2. **Install dependencies**:
+2. **Install dependencies:**
    ```bash
-   pip install matplotlib reportlab
+   pip install matplotlib
    ```
 
-3. **Run the application**:
+3. **Run the application:**
    ```bash
    python Complete_app.py
    ```
@@ -77,139 +127,52 @@ pip install matplotlib reportlab
 ## Usage Guide
 
 ### First Time Setup
-1. **Launch the application**
-2. **Register a new account** with your email and password
-3. **Login** with your credentials
+1. Launch the application
+2. Create a new user account with email and secure password
+3. Set up your initial accounts (checking, savings, etc.)
+4. Add your first transactions to get started
 
-### Getting Started
-1. **Create Accounts**: Add your bank accounts, cash, or savings accounts
-2. **Set Up Categories**: Create income and expense categories
-3. **Record Transactions**: Start tracking your income and expenses
-4. **Set Savings Goals**: Define what you're saving for
-5. **Create Budgets**: Set spending limits for different categories
+### Daily Usage
+1. **Adding Transactions**: Record income, expenses, and transfers
+2. **Managing Budgets**: Set monthly spending limits for categories
+3. **Tracking Goals**: Monitor progress towards savings targets
+4. **Viewing Reports**: Analyze spending patterns and financial health
 
-### Dashboard Overview
-- **Balance Summary**: Quick overview of total balance across accounts
-- **Recent Transactions**: Latest financial activities
-- **Savings Progress**: Visual representation of goal progress
-- **Budget Status**: Current budget performance
+### Sample Users
+The application includes sample data for testing:
+- **Sumi Smart**: Demonstrates good financial habits with regular savings
+- **Mike Spender**: Shows challenging financial patterns for comparison
 
-### Managing Transactions
-- **Add Income**: Record salary, freelance work, or other income sources
-- **Add Expenses**: Track daily expenses with categories and descriptions
-- **Transfer Money**: Move funds between your accounts
-- **View History**: Browse all transactions with pagination
+Both users have the password: `password123`
 
-### Savings Goals
-- **Create Goals**: Set target amounts and optional account associations
-- **Track Progress**: Monitor how close you are to achieving your goals
-- **Goal Completion**: Get notified when goals are reached
+## Key Benefits
 
-### Budget Management
-- **Set Budgets**: Define spending limits for categories
-- **Monitor Spending**: Real-time tracking against budget limits
-- **Receive Alerts**: Get warnings when approaching or exceeding budgets
-- **Flexible Periods**: Set monthly, weekly, or custom time ranges
-
-### Financial Reports
-- **Generate Reports**: Create detailed financial analysis
-- **Visual Charts**: View spending patterns and trends
-- **Export to PDF**: Save reports for record-keeping
-- **Custom Date Ranges**: Analyze specific time periods
-
-## Technical Details
-
-### Architecture
-- **Single File Application**: Complete app in one Python file for easy deployment
-- **SQLite Database**: Local database storage for all financial data
-- **Tkinter GUI**: Native cross-platform graphical interface
-- **Object-Oriented Design**: Clean, maintainable code structure
-
-### Database Schema
-- **Users**: Secure user authentication and profile data
-- **Accounts**: Multiple account types with balance tracking
-- **Categories**: Flexible categorization system
-- **Transactions**: Comprehensive transaction logging
-- **Saving Goals**: Goal tracking with progress monitoring
-- **Budgets**: Budget management with time period support
-
-### Security Features
-- **Password Hashing**: Secure password storage using SHA-256 with salt
-- **User Isolation**: Each user's data is completely separate
-- **Input Validation**: Comprehensive validation for all user inputs
-
-### Data Visualization
-- **Matplotlib Integration**: Charts and graphs for financial analysis
+- **Financial Awareness**: Clear visibility into spending patterns
+- **Budget Control**: Prevent overspending with category-based budgets
+- **Savings Motivation**: Goal tracking encourages consistent saving habits
+- **Data Security**: Local SQLite database keeps your financial data private
+- **User-Friendly**: Intuitive interface suitable for all experience levels
 
 ## File Structure
+
 ```
 Personal-Finance-Manager/
 ├── Complete_app.py          # Main application file
-├── README.md               # This file
-├── finance_manager.db      # SQLite database (created automatically)
-└── reports/               # Generated PDF reports (created automatically)
+├── finance_app.db          # SQLite database
+├── finance_app.log         # Application logs
+├── README.md              # This documentation
+└── SampleUsers.txt        # Sample user credentials
 ```
-
-## Configuration
-
-### Default Settings
-- **Database Path**: `finance_manager.db` (current directory)
-- **Items per Page**: 10 transactions per page
-- **Account Types**: Bank, Cash, Savings
-- **Category Types**: Income, Expense
-- **Budget Periods**: Month, Week, Custom
-
-### Customization
-You can modify the following constants in the code:
-- `DB_PATH`: Database file location
-- `ITEMS_PER_PAGE`: Number of items displayed per page
-- `BUDGET_CONFIG`: Budget time periods and defaults
-
-## Troubleshooting
-
-### Common Issues
-
-**1. Module Import Errors**
-```bash
-# Install missing dependencies
-pip install matplotlib reportlab
-```
-
-**2. Database Errors**
-- Ensure write permissions in the application directory
-- Check if `finance_manager.db` is not locked by another process
-
-**3. GUI Display Issues**
-- Ensure you're running in a desktop environment with GUI support
-- On Linux, you may need to install `python3-tk`
-
-**4. PDF Report Generation**
-- Verify ReportLab is installed: `pip install reportlab`
-- Check write permissions for the reports directory
-
-### Performance Notes
-- The application creates database indexes for optimal performance
-- Large transaction histories are handled with pagination
-- Reports are generated efficiently with optimized queries
 
 ## Contributing
 
-This is a single-file application designed for simplicity and portability. To contribute:
-
-1. Fork the repository
-2. Make your changes to `Complete_app.py`
-3. Test thoroughly with different user scenarios
-4. Submit a pull request with a clear description
+This project was developed as part of an academic assignment. For improvements or bug reports, please contact the development team.
 
 ## License
 
-This project is available under the MIT License. See the LICENSE file for details.
+This project is developed for educational purposes as part of coursework requirements.
 
-## Support
+---
 
-For support, please:
-1. Check the troubleshooting section above
-2. Review the code comments for implementation details
-3. Open an issue with detailed error information
-
-**Made with ❤️ for better financial management** 
+**Developed by Team Personal Finance Manager**  
+*Making personal finance management accessible and effective for everyone* 
