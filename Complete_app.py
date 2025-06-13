@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-"""
-Complete Finance Management Application - Single File Version
-Merged from multiple modules for easy deployment
-"""
+
 
 import tkinter as tk
 from tkinter import ttk, messagebox
@@ -296,10 +293,8 @@ class Transaction:
 class SavingGoal:
     """Saving goal model with validation"""
     
-    def __init__(self, goal_id: Optional[int] = None, user_id: int = 0,
-                 goal_name: str = "", target_amount: float = 0.0,
-                 current_amount: float = 0.0, account_id: Optional[int] = None,
-                 is_default: bool = False, date_created: Optional[str] = None):
+    def __init__(self, goal_id, user_id=0, goal_name="", target_amount=0.0,
+                 current_amount=0.0, account_id=None, is_default=False, date_created=None):
         self.goal_id = goal_id
         self.user_id = user_id
         self.goal_name = goal_name
@@ -325,11 +320,11 @@ class SavingGoal:
             
         return True, "OK"
     
-    def is_completed(self) -> bool:
+    def is_completed(self):
         """Check if goal is completed"""
         return self.current_amount >= self.target_amount and self.target_amount > 0
     
-    def progress_percentage(self) -> float:
+    def progress_percentage(self):
         """Get progress percentage"""
         if self.target_amount <= 0:
             return 0.0
@@ -340,10 +335,8 @@ class Budget:
     
     VALID_TIME_PERIODS = BUDGET_CONFIG['TIME_PERIODS']
     
-    def __init__(self, budget_id: Optional[int] = None, user_id: int = 0,
-                 category_id: int = 0, budget_amount: float = 0.0,
-                 time_period: str = "Month", start_date: Optional[str] = None,
-                 end_date: Optional[str] = None, date_created: Optional[str] = None):
+    def __init__(self, budget_id=None, user_id=0, category_id=0, budget_amount=0.0,
+                 time_period="Month", start_date=None, end_date=None, date_created=None):
         self.budget_id = budget_id
         self.user_id = user_id
         self.category_id = category_id
@@ -421,7 +414,7 @@ logger = logging.getLogger(__name__)
 class Database:
     """Database management class with full CRUD operations"""
     
-    def __init__(self, db_path: str = DB_PATH):
+    def __init__(self, db_path=DB_PATH):
         self.db_path = db_path
         self.init_database()
     
@@ -591,15 +584,15 @@ class Database:
         
         logger.info("Account table migration completed")
     
-    def _hash_password(self, password: str, salt: str) -> str:
+    def _hash_password(self, password, salt):
         """Hash password with salt"""
         return hashlib.sha256((password + salt).encode()).hexdigest()
     
-    def _generate_salt(self) -> str:
+    def _generate_salt(self):
         """Generate random salt"""
         return secrets.token_hex(SALT_LENGTH)
     
-    def create_user(self, user: User) -> int:
+    def create_user(self, user):
         """Create a new user"""
         is_valid, error_msg = user.is_valid()
         if not is_valid:
@@ -633,7 +626,7 @@ class Database:
         except DatabaseError:
             raise
     
-    def _create_default_data(self, cursor, user_id: int):
+    def _create_default_data(self, cursor, user_id):
         """Create default accounts and categories for new user"""
         # Create default accounts
         for acc_data in DEFAULT_ACCOUNTS:
@@ -663,7 +656,7 @@ class Database:
         """, (user_id, DEFAULT_SAVING_GOAL['name'], DEFAULT_SAVING_GOAL['target_amount'], 
               0.0, saving_account_id, DEFAULT_SAVING_GOAL['is_default']))
     
-    def authenticate_user(self, email: str, password: str) -> Optional[User]:
+    def authenticate_user(self, email, password):
         """Authenticate user login"""
         try:
             with self.get_connection() as conn:
@@ -686,7 +679,7 @@ class Database:
             logger.error(f"Authentication error: {e}")
             return None
     
-    def get_user(self, user_id: int) -> Optional[User]:
+    def get_user(self, user_id):
         """Get user by ID"""
         with self.get_connection() as conn:
             cursor = conn.cursor()
@@ -703,7 +696,7 @@ class Database:
                 )
             return None
     
-    def create_account(self, account: Account) -> int:
+    def create_account(self, account):
         """Create a new account"""
         is_valid, error_msg = account.is_valid()
         if not is_valid:
@@ -730,7 +723,7 @@ class Database:
             logger.info(f"Account created with ID: {account_id}")
             return account_id
     
-    def get_user_accounts(self, user_id: int) -> List[Account]:
+    def get_user_accounts(self, user_id):
         """Get all accounts for a user"""
         with self.get_connection() as conn:
             cursor = conn.cursor()
@@ -745,7 +738,7 @@ class Database:
                 account_type=row['AccountType']
             ) for row in rows]
     
-    def delete_account(self, account_id: int, user_id: int) -> bool:
+    def delete_account(self, account_id, user_id):
         """Delete an account"""
         with self.get_connection() as conn:
             cursor = conn.cursor()
@@ -756,7 +749,7 @@ class Database:
             conn.commit()
             return success
     
-    def create_category(self, category: Category) -> int:
+    def create_category(self, category):
         """Create a new category"""
         is_valid, error_msg = category.is_valid()
         if not is_valid:
@@ -774,7 +767,7 @@ class Database:
             logger.info(f"Category created with ID: {category_id}")
             return category_id
     
-    def get_user_categories(self, user_id: int) -> List[Category]:
+    def get_user_categories(self, user_id):
         """Get all categories for a user"""
         with self.get_connection() as conn:
             cursor = conn.cursor()
@@ -788,7 +781,7 @@ class Database:
                 category_type=row['CategoryType']
             ) for row in rows]
     
-    def delete_category(self, category_id: int, user_id: int) -> bool:
+    def delete_category(self, category_id, user_id):
         """Delete a category"""
         with self.get_connection() as conn:
             cursor = conn.cursor()
@@ -799,7 +792,7 @@ class Database:
             conn.commit()
             return success
     
-    def create_transaction(self, transaction: Transaction) -> int:
+    def create_transaction(self, transaction):
         """Create a new transaction and update account balances"""
         is_valid, error_msg = transaction.is_valid()
         if not is_valid:
@@ -870,7 +863,7 @@ class Database:
                 conn.rollback()
                 raise DatabaseError(f"Failed to create transaction: {e}")
     
-    def _update_saving_goal_from_account(self, cursor, account_id: int):
+    def _update_saving_goal_from_account(self, cursor, account_id):
         """Update saving goal amount based on account balance"""
         # Check if this account is associated with a saving goal
         cursor.execute("""
