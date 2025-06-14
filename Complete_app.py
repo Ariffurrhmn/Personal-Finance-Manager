@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
+
 # =============================================================================
 # CONFIGURATION
 # =============================================================================
@@ -104,22 +105,22 @@ DEFAULT_SAVING_GOAL = {
     'target_amount': 0.0,
     'is_default': True
 }
+
 # =============================================================================
 # MODELS
 # =============================================================================
-# Keep this for compatibility with existing code
 class ValidationError(Exception):
     """Simple validation error"""
     pass
 class DatabaseError(Exception):
     """Simple database error"""
     pass
-# Simple validation helpers
+
 def is_valid_name(name):
     """Check if name is valid"""
     if not name or len(name.strip()) == 0:
         return False
-    if len(name) > 100:  # Simple limit
+    if len(name) > 100:
         return False
     return True
 def is_valid_email(email):
@@ -311,10 +312,10 @@ class Budget:
         end_date = datetime.fromisoformat(self.end_date.replace('Z', '+00:00'))
         remaining = (end_date - datetime.now()).days
         return max(0, remaining)
+
 # =============================================================================
 # DATABASE LAYER
 # =============================================================================
-# Removed logging system for cleaner code
 class Database:
     """Simplified database management class"""
     def __init__(self, db_path=DB_PATH):
@@ -684,9 +685,7 @@ class Database:
     def close(self):
         """Close database connection"""
         pass 
-    # =============================================================================
-    # SAVING GOALS METHODS
-    # =============================================================================
+
     def create_saving_goal(self, goal):
         """Create a new saving goal and associated saving account"""
         is_valid, error_msg = goal.is_valid()
@@ -824,9 +823,7 @@ class Database:
             balance=row['Balance'],
             account_type=row['AccountType']
         ) for row in rows]
-    # =============================================================================
-    # BUDGET METHODS
-    # =============================================================================
+
     def create_budget(self, budget):
         """Create a new budget"""
         is_valid, error_msg = budget.is_valid()
@@ -964,6 +961,7 @@ class Database:
                 'exceeded_by': new_total - row['BudgetAmount']
             }
         return None
+
 # =============================================================================
 # UI COMPONENTS
 # =============================================================================
@@ -1632,8 +1630,9 @@ class BudgetPopup(PopupWindow):
             messagebox.showerror("Validation Error", str(e))
         except DatabaseError as e:
             messagebox.showerror("Database Error", str(e))
+
 # =============================================================================
-# MAIN APPLICATION UI
+# MAIN APPLICATION
 # =============================================================================
 class MainApp:
     """Main application UI"""
@@ -3452,13 +3451,14 @@ class MainApp:
                 progress_frame.pack_propagate(False)
                 progress_fill = tk.Frame(progress_frame, bg=COLORS['GREEN'], height=15)
                 progress_fill.place(relwidth=min(progress/100, 1.0), relheight=1)
+
 # =============================================================================
 # APPLICATION CONTROLLER
 # =============================================================================
 class FinanceApp:
     """Main application controller"""
     def __init__(self):
-        # Don't create main window yet - start with login popup
+
         self.main_root = None
         self.login_window = None
         self.database = None
@@ -3487,7 +3487,7 @@ class FinanceApp:
             x = (self.login_window.winfo_screenwidth() // 2) - (width // 2)
             y = (self.login_window.winfo_screenheight() // 2) - (height // 2)
             self.login_window.geometry(f"{width}x{height}+{x}+{y}")
-            # Window icon removed per user request
+
             # Set up window close handler
             self.login_window.protocol("WM_DELETE_WINDOW", self.on_login_closing)
             self.current_screen = LoginScreen(
@@ -3636,6 +3636,7 @@ class FinanceApp:
         except Exception as e:
             messagebox.showerror("Fatal Error", f"An unexpected error occurred: {e}")
             sys.exit(1)
+
 # =============================================================================
 # MAIN ENTRY POINT
 # =============================================================================
